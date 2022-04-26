@@ -4,7 +4,7 @@ import OrderModel from "./order.model";
 import OrderRepositoryInterface from "../../../../domain/checkout/repository/order-repository.interface";
 import OrderItem from "../../../../domain/checkout/entity/order_item";
 
-export default class OrderRepository implements OrderRepositoryInterface{
+export default class OrderRepository implements OrderRepositoryInterface {
   async create(entity: Order): Promise<void> {
     await OrderModel.create(
       {
@@ -26,20 +26,23 @@ export default class OrderRepository implements OrderRepositoryInterface{
   }
 
   async update(entity: Order): Promise<void> {
-      
+
   }
 
   async find(id: string): Promise<Order> {
-      const orderModel = await OrderModel.findOne({ where: { id } });
-      return new Order(orderModel.id, orderModel.customer_id, orderModel.items.map(item => new OrderItem(item.id, item.name, item.price, item.product_id, item.quantity)));
+    const orderModel = await OrderModel.findOne({ where: { id } });
+    if (orderModel) {
+      const items = orderModel.items.map(item => new OrderItem(item.id, item.name, item.price, item.product_id, item.quantity));
+      return new Order(orderModel.id, orderModel.customer_id, items);
+    }
+    throw new Error("Order not found");
   }
 
   async findAll(): Promise<Order[]> {
     const orderModels = await OrderModel.findAll();
     return orderModels.map(order => {
-      return new Order(order.id, order.customer_id, order.items.map(item => {
-        return new OrderItem(item.id, item.name, item.price, item.product_id, item.quantity);
-      }));
+      const items = order.items.map(item => new OrderItem(item.id, item.name, item.price, item.product_id, item.quantity));
+      return new Order(order.id, order.customer_id, items);
     });
   }
 }

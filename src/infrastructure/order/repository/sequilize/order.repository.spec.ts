@@ -118,7 +118,14 @@ describe("Order repository test", () => {
     expect(orderModel.toJSON).toStrictEqual({
       id: foundOrder.id,
       customer_id: foundOrder.customerId,
-      items: foundOrder.items,
+      items: [{
+        id: ordemItem.id,
+        name: ordemItem.name,
+        price: ordemItem.price,
+        quantity: ordemItem.quantity,
+        order_id: "1",
+        product_id: "123",
+      }],
       total: foundOrder.total()
     });
   });
